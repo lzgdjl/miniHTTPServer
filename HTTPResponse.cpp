@@ -9,6 +9,8 @@
 
 #include"HTTPResponse.h"
 
+using namespace std;
+
 HTTPResponse::HTTPResponse(): m_responseBody(""), m_data("")
 {
 }
@@ -19,8 +21,8 @@ HTTPResponse::~HTTPResponse()
 
 void HTTPResponse::printResponse()
 {
-	cout<<"---Response Begin---"<<endl<<m_data
-		<<"---Response End---"<<endl;
+	cout << "---Response Begin---" << endl << m_data
+		<< "---Response End---" << endl;
 }
 
 void HTTPResponse::addData(const char *buf, const int&len)
@@ -85,7 +87,6 @@ int HTTPResponse::setReasonPhrase()
 			break;
 		default:
 			return -1;
-			break;
 	}
 
 	return 0;
@@ -156,14 +157,14 @@ int HTTPResponse::prepareResponse(void )
 			break;
 	}
 
-	dataStream<<protocol<<" "<<m_statusCode<<" "<<m_reasonPhrase<<CRLF;
+	dataStream << protocol << " " << m_statusCode << " " << m_reasonPhrase << CRLF;
 
 	for(vector<pair<string, string> >::iterator  it = m_httpHeaders.begin(); it!=m_httpHeaders.end(); it++){
 		dataStream<<(*it).first<<": "<<(*it).second<<CRLF;
 	}
-	dataStream<<CRLF;
+	dataStream << CRLF;
 
-	dataStream<<m_responseBody;
+	dataStream << m_responseBody;
 
 	m_data = dataStream.str();
 	return 0;
@@ -242,7 +243,7 @@ int HTTPResponse::parseResponse()
 			break;
 	}
 
-	parseCursorOld+=2;
+	parseCursorOld += 2;
 	m_responseBody = m_data.substr(parseCursorOld);
 	
 	return 0;

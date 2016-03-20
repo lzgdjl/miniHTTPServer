@@ -12,11 +12,11 @@
 class HTTPServer{
 	public:
 		HTTPServer();
-		HTTPServer(int );
+		HTTPServer(int);
 		~HTTPServer();
 
-		int run(void );
-		int setPort(size_t );
+		int run();
+		int setPort(size_t);
 		int initSocket();
 
 		int handleRequest();
@@ -38,7 +38,7 @@ class HTTPServer{
 		std::string m_mimeType;
 		HTTPRequest* m_httpRequest;
 		HTTPResponse* m_httpResponse;
-		static const int buf_sz = 32;
+		static int buf_sz = 32;
 };
 
 #endif

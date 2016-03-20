@@ -1,9 +1,3 @@
-/* HTTPServer.cpp */
-
-/* An HTTP Server written in C++ */
-/* Sweta Yamini		06CS3008	
-   Naveen Kumar Molleti 06CS3009	*/
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -33,7 +27,7 @@ HTTPServer::HTTPServer(int port)
 	string funcName = "HTTPServer::HTTPServer: ";
 
 	if(setPort(port)){
-		cerr<<funcName<<"Failed to set port"<<endl;
+		cerr << funcName << "Failed to set port" << endl;
 	}
 }
 
@@ -47,8 +41,8 @@ int HTTPServer::setPort(size_t port)
 {
 	string funcName = "setPort: ";
 	//Validation
-	if(port<1024||port>65535){
-		cerr<<funcName<<"Invalid port value. Cannot bind. Enter a value between 1024 and 65535"<<endl;
+	if(port < 1024 || port > 65535){
+		cerr << funcName << "Invalid port value. Cannot bind. Enter a value between 1024 and 65535" << endl;
 		return -1;
 	}
 
@@ -61,8 +55,8 @@ int HTTPServer::initSocket()
 {
 	string funcName = "initSocket: ";
 
-	if((sockfd = socket(AF_INET, SOCK_STREAM, 0))<0){
-		cerr<<funcName<<"Failed to create socket"<<endl;
+	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+		cerr << funcName << "Failed to create socket" << endl;
 		return -1;
 	}
 
@@ -71,14 +65,14 @@ int HTTPServer::initSocket()
 	servAddr.sin_addr.s_addr = INADDR_ANY;
 
 	/* Bind */
-	if((bind(sockfd, (struct sockaddr *)&servAddr, sizeof(servAddr)))<0){
-		cerr<<funcName<<"Failed to bind to port "<<svrPort<<endl;
+	if((bind(sockfd, (struct sockaddr *)&servAddr, sizeof(servAddr))) < 0){
+		cerr << funcName << "Failed to bind to port "<< svrPort << endl;
 		return -1;
 	}
 
 	/* Set to listen on control socket */
-	if(listen(sockfd, 5)){
-		cerr<<funcName<<"Listen on port "<<svrPort<<" failed"<<endl;
+	if(listen(sockfd, 8)){
+		cerr << funcName << "Listen on port " << svrPort << " failed" << endl;
 		return -1;
 	}
 
@@ -90,21 +84,21 @@ int HTTPServer::run()
 	string funcName = "run: ";
 
 	if(initSocket()){
-		cerr<<funcName<<"Failed to initialize socket"<<endl;
+		cerr << funcName << "Failed to initialize socket" << endl;
 		return -1;
 	}
 
 	while(1){
 		cliLen = sizeof(cliAddr);
 
-		if((newsockfd = accept(sockfd, (struct sockaddr *)&cliAddr, &cliLen))<0){
-			cerr<<funcName<<"Accept call failed"<<endl;
+		if((newsockfd = accept(sockfd, (struct sockaddr *)&cliAddr, &cliLen)) < 0){
+			cerr << funcName << "Accept call failed" << endl;
 			return -1;
 		}
 
 		if(fork() == 0){
-			if(handleRequest()){
-				cerr<<funcName<<"Failed handling request"<<endl;
+			if(handleRequest() < 0){
+				cerr << funcName << "Failed handling request" << endl;
 				exit(-1);
 			}
 
@@ -123,32 +117,32 @@ int HTTPServer::handleRequest()
 	m_httpRequest = new HTTPRequest();
 	m_httpResponse = new HTTPResponse();
 	 
-	if(recvRequest()){
-		cerr<<funcName<<"Receiving request failed"<<endl;
+	if(recvRequest() < 0){
+		cerr << funcName << "Receiving request failed" << endl;
 		return -1;
 	}
 
 	m_httpRequest->printRequest();
 
-	if(parseRequest()){
-		cerr<<funcName<<"Parsing HTTP Request failed"<<endl;
+	if(parseRequest() < 0){
+		cerr << funcName << "Parsing HTTP Request failed" << endl;
 		return -1;
 	}
 
-	if(processRequest()){
-		cerr<<funcName<<"Processing HTTP Request failed"<<endl;
+	if(processRequest() < 0){
+		cerr << funcName << "Processing HTTP Request failed" << endl;
 		return -1;
 	}
 
-	if(prepareResponse()){
-		cerr<<funcName<<"Preparing reply failed"<<endl;
+	if(prepareResponse() < 0){
+		cerr << funcName << "Preparing reply failed" << endl;
 		return -1;
 	}
 
 	m_httpResponse->printResponse();
 
-	if(sendResponse()){
-		cerr<<funcName<<"Sending reply failed"<<endl;
+	if(sendResponse() < 0){
+		cerr << funcName << "Sending reply failed" << endl;
 		return -1;
 	}
 	
@@ -164,8 +158,8 @@ int HTTPServer::recvRequest()
 	char* buf = new char[buf_sz];
 	memset(buf, '\0', buf_sz);
 
-	if(!(recvLength = recv(newsockfd, buf, buf_sz, 0))){
-		cerr<<funcName<<"Failed to receive request (blocking)"<<endl;
+	if((recvLength = recv(newsockfd, buf, buf_sz, 0)) < 0){
+		cerr << funcName << "Failed to receive request (blocking)" << endl;
 		return -1;
 	}
 	m_httpRequest->addData(buf, recvLength);
@@ -178,14 +172,14 @@ int HTTPServer::recvRequest()
 			if(errno == EWOULDBLOCK || errno == EAGAIN){
 				break;
 			} else {
-				cerr<<funcName<<"Failed receiving request (nonblocking)"<<endl;
+				cerr << funcName << "Failed receiving request (nonblocking)" << endl;
 				return -1;
 			}
 		}
 	
 		m_httpRequest->addData(buf, recvLength);
 
-		if(recvLength<buf_sz)
+		if(recvLength < buf_sz)
 			break;
 	}
 
@@ -196,8 +190,8 @@ int HTTPServer::parseRequest()
 {
 	string funcName = "parseRequest: ";
 
-	if(m_httpRequest->parseRequest()){
-		cerr<<funcName<<"Failed parsing request"<<endl;
+	if(m_httpRequest->parseRequest() < 0){
+		cerr << funcName << "Failed parsing request" << endl;
 		return -1;
 	}
 
@@ -232,7 +226,7 @@ int HTTPServer::processRequest()
 				os<<contentLength;
 
 				if(m_httpResponse->copyFromFile(ifs, contentLength)){
-					cerr<<funcName<<"Failed to copy file to Response Body"<<endl;
+					cerr << funcName << "Failed to copy file to Response Body" << endl;
 					m_httpResponse->setStatusCode(500);
 					return 0;
 				}
@@ -251,7 +245,7 @@ int HTTPServer::processRequest()
 					os<<contentLength;
 
 					if(m_httpResponse->copyFromFile(errfs, contentLength)){
-						cerr<<funcName<<"Failed to copy file to Response Body"<<endl;
+						cerr << funcName << "Failed to copy file to Response Body" << endl;
 						m_httpResponse->setStatusCode(500);
 						return 0;
 					}
@@ -260,7 +254,7 @@ int HTTPServer::processRequest()
 					m_httpResponse->setStatusCode(404);
 					return 0;
 				}else{
-					cerr<<"Critical error. Shutting down"<<endl;
+					cerr << "Critical error. Shutting down" << endl;
 					return -1;
 				}
 			}
@@ -312,7 +306,7 @@ int HTTPServer::prepareResponse()
 	m_httpResponse->setHTTPHeader("Connection", "close");
 
 	if(m_httpResponse->prepareResponse()){
-		cerr<<funcName<<"Failed to prepare response"<<endl;
+		cerr << funcName << "Failed to prepare response" << endl;
 		return -1;
 	}
 
@@ -331,7 +325,7 @@ int HTTPServer::sendResponse()
 	memcpy(buf, responseDataPtr->data(), responseSize);
 
 	if((send(newsockfd, buf, responseSize, 0))<0){
-		cerr<<funcName<<"Sending response failed"<<endl;
+		cerr << funcName << "Sending response failed" << endl;
 	}
 
 	delete buf;

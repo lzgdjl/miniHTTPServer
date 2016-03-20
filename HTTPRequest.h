@@ -53,9 +53,9 @@ class HTTPRequest{
 		std::string m_userAgent;
 
 		std::vector<std::pair<std::string, std::string>> http_headers;
-		std::string request_body;
+		std::string m_requestBody;
 		
-		std::string data;
+		std::string m_data;
 };
 
 #endif

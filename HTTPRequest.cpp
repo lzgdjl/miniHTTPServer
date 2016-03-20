@@ -1,11 +1,11 @@
 /* HTTPRequest.cpp */
 
-#include<iostream>
-#include<string>
-#include<vector>
-#include<iterator>
-#include<cstdlib>
-#include<cstring>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iterator>
+#include <cstdlib>
+#include <cstring>
 
 #include"HTTPRequest.h"
 
@@ -21,7 +21,7 @@ HTTPRequest::~HTTPRequest()
 
 void HTTPRequest::printRequest()
 {
-	cou << "---Request Begin---" << endl << m_data
+	cout << "---Request Begin---" << endl << m_data
 		<< "---Request End---" << endl;
 }
 
@@ -203,7 +203,7 @@ int HTTPRequest::parseRequest()
 			break;
 	}
 
-	parseCursorOld+=2;
+	parseCursorOld += 2;
 	m_requestBody = m_data.substr(parseCursorOld);
 	
 	return 0;
